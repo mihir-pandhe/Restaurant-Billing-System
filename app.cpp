@@ -19,55 +19,12 @@ struct MenuItem
     double price;
 };
 
-class RestaurantBillingSystem
+class MenuManager
 {
 private:
-    vector<Order> orders;
     vector<MenuItem> menu;
-    double discountPercentage;
-    double taxPercentage;
 
 public:
-    RestaurantBillingSystem() : discountPercentage(0.0), taxPercentage(0.0) {}
-
-    void displayMenu()
-    {
-        cout << "\n--- Restaurant Billing System ---" << endl;
-        cout << "1. Enter Order" << endl;
-        cout << "2. View Orders" << endl;
-        cout << "3. Calculate Bill" << endl;
-        cout << "4. Add Menu Item" << endl;
-        cout << "5. Edit Menu Item" << endl;
-        cout << "6. Remove Menu Item" << endl;
-        cout << "7. Save Menu to File" << endl;
-        cout << "8. Set Discount" << endl;
-        cout << "9. Set Tax" << endl;
-        cout << "10. Exit" << endl;
-        cout << "------------------------------" << endl;
-    }
-
-    void enterOrder()
-    {
-        string item;
-        int quantity;
-        double price;
-        cout << "Enter item name: ";
-        cin.ignore();
-        getline(cin, item);
-        cout << "Enter quantity: ";
-        cin >> quantity;
-        price = getItemPrice(item);
-        if (price != -1)
-        {
-            orders.push_back({item, quantity, price});
-            cout << "Order entered successfully." << endl;
-        }
-        else
-        {
-            cout << "Item not found in menu." << endl;
-        }
-    }
-
     double getItemPrice(const string &itemName)
     {
         for (const auto &menuItem : menu)
@@ -78,52 +35,6 @@ public:
             }
         }
         return -1;
-    }
-
-    void viewOrders()
-    {
-        if (orders.empty())
-        {
-            cout << "No orders have been placed yet." << endl;
-        }
-        else
-        {
-            cout << "\nCurrent Orders:" << endl;
-            cout << "------------------------------" << endl;
-            for (size_t i = 0; i < orders.size(); ++i)
-            {
-                cout << i + 1 << ". Item: " << orders[i].item << ", Quantity: " << orders[i].quantity << ", Price: $" << fixed << setprecision(2) << orders[i].price << endl;
-            }
-            cout << "------------------------------" << endl;
-        }
-    }
-
-    void calculateBill()
-    {
-        if (orders.empty())
-        {
-            cout << "No orders have been placed yet." << endl;
-        }
-        else
-        {
-            double subtotal = 0.0;
-            cout << "\nDetailed Bill:" << endl;
-            cout << "------------------------------" << endl;
-            for (const auto &order : orders)
-            {
-                double itemTotal = order.quantity * order.price;
-                subtotal += itemTotal;
-                cout << "Item: " << order.item << ", Quantity: " << order.quantity << ", Price: $" << fixed << setprecision(2) << order.price << ", Total: $" << itemTotal << endl;
-            }
-            double discount = (discountPercentage / 100) * subtotal;
-            double tax = (taxPercentage / 100) * (subtotal - discount);
-            double total = subtotal - discount + tax;
-            cout << "------------------------------" << endl;
-            cout << "Subtotal: $" << fixed << setprecision(2) << subtotal << endl;
-            cout << "Discount (" << discountPercentage << "%): -$" << discount << endl;
-            cout << "Tax (" << taxPercentage << "%): +$" << tax << endl;
-            cout << "Total: $" << total << endl;
-        }
     }
 
     void addMenuItem()
@@ -193,6 +104,85 @@ public:
             cout << "Error opening file." << endl;
         }
     }
+};
+
+class BillingManager
+{
+private:
+    vector<Order> orders;
+    double discountPercentage;
+    double taxPercentage;
+
+public:
+    BillingManager() : discountPercentage(0.0), taxPercentage(0.0) {}
+
+    void enterOrder(MenuManager &menuManager)
+    {
+        string item;
+        int quantity;
+        double price;
+        cout << "Enter item name: ";
+        cin.ignore();
+        getline(cin, item);
+        cout << "Enter quantity: ";
+        cin >> quantity;
+        price = menuManager.getItemPrice(item);
+        if (price != -1)
+        {
+            orders.push_back({item, quantity, price});
+            cout << "Order entered successfully." << endl;
+        }
+        else
+        {
+            cout << "Item not found in menu." << endl;
+        }
+    }
+
+    void viewOrders()
+    {
+        if (orders.empty())
+        {
+            cout << "No orders have been placed yet." << endl;
+        }
+        else
+        {
+            cout << "\nCurrent Orders:" << endl;
+            cout << "------------------------------" << endl;
+            for (size_t i = 0; i < orders.size(); ++i)
+            {
+                cout << i + 1 << ". Item: " << orders[i].item << ", Quantity: " << orders[i].quantity << ", Price: $" << fixed << setprecision(2) << orders[i].price << endl;
+            }
+            cout << "------------------------------" << endl;
+        }
+    }
+
+    void calculateBill()
+    {
+        if (orders.empty())
+        {
+            cout << "No orders have been placed yet." << endl;
+        }
+        else
+        {
+            double subtotal = 0.0;
+            cout << "\nDetailed Bill:" << endl;
+            cout << "------------------------------" << endl;
+            for (const auto &order : orders)
+            {
+                double itemTotal = order.quantity * order.price;
+                subtotal += itemTotal;
+                cout << "Item: " << order.item << ", Quantity: " << order.quantity << ", Price: $" << fixed << setprecision(2) << order.price << ", Total: $" << itemTotal << endl;
+            }
+            double discount = (discountPercentage / 100) * subtotal;
+            double tax = (taxPercentage / 100) * (subtotal - discount);
+            double total = subtotal - discount + tax;
+            cout << "------------------------------" << endl;
+            cout << "Subtotal: $" << fixed << setprecision(2) << subtotal << endl;
+            cout << "Discount (" << discountPercentage << "%): -$" << discount << endl;
+            cout << "Tax (" << taxPercentage << "%): +$" << tax << endl;
+            cout << "Total: $" << total << endl;
+        }
+    }
 
     void setDiscount()
     {
@@ -207,13 +197,31 @@ public:
         cin >> taxPercentage;
         cout << "Tax set to " << taxPercentage << "%" << endl;
     }
+};
 
-    void exitSystem()
+class RestaurantBillingSystem
+{
+private:
+    MenuManager menuManager;
+    BillingManager billingManager;
+
+    void displayMenu()
     {
-        cout << "Exiting system..." << endl;
-        exit(0);
+        cout << "\n--- Restaurant Billing System ---" << endl;
+        cout << "1. Enter Order" << endl;
+        cout << "2. View Orders" << endl;
+        cout << "3. Calculate Bill" << endl;
+        cout << "4. Add Menu Item" << endl;
+        cout << "5. Edit Menu Item" << endl;
+        cout << "6. Remove Menu Item" << endl;
+        cout << "7. Save Menu to File" << endl;
+        cout << "8. Set Discount" << endl;
+        cout << "9. Set Tax" << endl;
+        cout << "10. Exit" << endl;
+        cout << "------------------------------" << endl;
     }
 
+public:
     void run()
     {
         while (true)
@@ -225,35 +233,35 @@ public:
             switch (choice)
             {
             case 1:
-                enterOrder();
+                billingManager.enterOrder(menuManager);
                 break;
             case 2:
-                viewOrders();
+                billingManager.viewOrders();
                 break;
             case 3:
-                calculateBill();
+                billingManager.calculateBill();
                 break;
             case 4:
-                addMenuItem();
+                menuManager.addMenuItem();
                 break;
             case 5:
-                editMenuItem();
+                menuManager.editMenuItem();
                 break;
             case 6:
-                removeMenuItem();
+                menuManager.removeMenuItem();
                 break;
             case 7:
-                saveMenuToFile();
+                menuManager.saveMenuToFile();
                 break;
             case 8:
-                setDiscount();
+                billingManager.setDiscount();
                 break;
             case 9:
-                setTax();
+                billingManager.setTax();
                 break;
             case 10:
-                exitSystem();
-                break;
+                cout << "Exiting system..." << endl;
+                return;
             default:
                 cout << "Invalid option. Please try again." << endl;
                 break;
