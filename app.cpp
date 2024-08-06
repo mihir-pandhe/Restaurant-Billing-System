@@ -3,6 +3,7 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
+#include <limits>
 
 using namespace std;
 
@@ -42,10 +43,15 @@ public:
         string name;
         double price;
         cout << "Enter item name: ";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, name);
         cout << "Enter price: ";
-        cin >> price;
+        while (!(cin >> price) || price < 0)
+        {
+            cout << "Invalid price. Enter a valid positive number: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
         menu.push_back({name, price});
         cout << "Menu item added successfully." << endl;
     }
@@ -54,14 +60,19 @@ public:
     {
         string name;
         cout << "Enter item name to edit: ";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, name);
         for (auto &menuItem : menu)
         {
             if (menuItem.name == name)
             {
                 cout << "Enter new price: ";
-                cin >> menuItem.price;
+                while (!(cin >> menuItem.price) || menuItem.price < 0)
+                {
+                    cout << "Invalid price. Enter a valid positive number: ";
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
                 cout << "Menu item updated successfully." << endl;
                 return;
             }
@@ -73,7 +84,7 @@ public:
     {
         string name;
         cout << "Enter item name to remove: ";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, name);
         for (auto it = menu.begin(); it != menu.end(); ++it)
         {
@@ -122,10 +133,15 @@ public:
         int quantity;
         double price;
         cout << "Enter item name: ";
-        cin.ignore();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, item);
         cout << "Enter quantity: ";
-        cin >> quantity;
+        while (!(cin >> quantity) || quantity <= 0)
+        {
+            cout << "Invalid quantity. Enter a valid positive number: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
         price = menuManager.getItemPrice(item);
         if (price != -1)
         {
@@ -187,14 +203,24 @@ public:
     void setDiscount()
     {
         cout << "Enter discount percentage: ";
-        cin >> discountPercentage;
+        while (!(cin >> discountPercentage) || discountPercentage < 0 || discountPercentage > 100)
+        {
+            cout << "Invalid percentage. Enter a number between 0 and 100: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
         cout << "Discount set to " << discountPercentage << "%" << endl;
     }
 
     void setTax()
     {
         cout << "Enter tax percentage: ";
-        cin >> taxPercentage;
+        while (!(cin >> taxPercentage) || taxPercentage < 0 || taxPercentage > 100)
+        {
+            cout << "Invalid percentage. Enter a number between 0 and 100: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
         cout << "Tax set to " << taxPercentage << "%" << endl;
     }
 };
@@ -229,7 +255,12 @@ public:
             displayMenu();
             int choice;
             cout << "Select an option: ";
-            cin >> choice;
+            while (!(cin >> choice))
+            {
+                cout << "Invalid input. Please enter a number: ";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
             switch (choice)
             {
             case 1:
