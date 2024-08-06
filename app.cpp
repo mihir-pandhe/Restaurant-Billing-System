@@ -1,8 +1,20 @@
 #include <iostream>
+#include <vector>
+#include <string>
+
 using namespace std;
+
+struct Order
+{
+    string item;
+    int quantity;
+};
 
 class RestaurantBillingSystem
 {
+private:
+    vector<Order> orders;
+
 public:
     void displayMenu()
     {
@@ -15,12 +27,31 @@ public:
 
     void enterOrder()
     {
-        cout << "Entering order..." << endl;
+        string item;
+        int quantity;
+        cout << "Enter item name: ";
+        cin.ignore();
+        getline(cin, item);
+        cout << "Enter quantity: ";
+        cin >> quantity;
+        orders.push_back({item, quantity});
+        cout << "Order entered successfully." << endl;
     }
 
     void viewOrders()
     {
-        cout << "Viewing orders..." << endl;
+        if (orders.empty())
+        {
+            cout << "No orders have been placed yet." << endl;
+        }
+        else
+        {
+            cout << "\nCurrent Orders:" << endl;
+            for (const auto &order : orders)
+            {
+                cout << "Item: " << order.item << ", Quantity: " << order.quantity << endl;
+            }
+        }
     }
 
     void exitSystem()
