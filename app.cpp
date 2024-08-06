@@ -24,8 +24,12 @@ class RestaurantBillingSystem
 private:
     vector<Order> orders;
     vector<MenuItem> menu;
+    double discountPercentage;
+    double taxPercentage;
 
 public:
+    RestaurantBillingSystem() : discountPercentage(0.0), taxPercentage(0.0) {}
+
     void displayMenu()
     {
         cout << "\n--- Restaurant Billing System ---" << endl;
@@ -36,7 +40,9 @@ public:
         cout << "5. Edit Menu Item" << endl;
         cout << "6. Remove Menu Item" << endl;
         cout << "7. Save Menu to File" << endl;
-        cout << "8. Exit" << endl;
+        cout << "8. Set Discount" << endl;
+        cout << "9. Set Tax" << endl;
+        cout << "10. Exit" << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -100,12 +106,23 @@ public:
         }
         else
         {
-            double total = 0.0;
+            double subtotal = 0.0;
+            cout << "\nDetailed Bill:" << endl;
+            cout << "------------------------------" << endl;
             for (const auto &order : orders)
             {
-                total += order.quantity * order.price;
+                double itemTotal = order.quantity * order.price;
+                subtotal += itemTotal;
+                cout << "Item: " << order.item << ", Quantity: " << order.quantity << ", Price: $" << fixed << setprecision(2) << order.price << ", Total: $" << itemTotal << endl;
             }
-            cout << "\nTotal Bill: $" << fixed << setprecision(2) << total << endl;
+            double discount = (discountPercentage / 100) * subtotal;
+            double tax = (taxPercentage / 100) * (subtotal - discount);
+            double total = subtotal - discount + tax;
+            cout << "------------------------------" << endl;
+            cout << "Subtotal: $" << fixed << setprecision(2) << subtotal << endl;
+            cout << "Discount (" << discountPercentage << "%): -$" << discount << endl;
+            cout << "Tax (" << taxPercentage << "%): +$" << tax << endl;
+            cout << "Total: $" << total << endl;
         }
     }
 
@@ -177,6 +194,20 @@ public:
         }
     }
 
+    void setDiscount()
+    {
+        cout << "Enter discount percentage: ";
+        cin >> discountPercentage;
+        cout << "Discount set to " << discountPercentage << "%" << endl;
+    }
+
+    void setTax()
+    {
+        cout << "Enter tax percentage: ";
+        cin >> taxPercentage;
+        cout << "Tax set to " << taxPercentage << "%" << endl;
+    }
+
     void exitSystem()
     {
         cout << "Exiting system..." << endl;
@@ -215,6 +246,12 @@ public:
                 saveMenuToFile();
                 break;
             case 8:
+                setDiscount();
+                break;
+            case 9:
+                setTax();
+                break;
+            case 10:
                 exitSystem();
                 break;
             default:
