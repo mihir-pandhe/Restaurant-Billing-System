@@ -47,10 +47,12 @@ public:
         else
         {
             cout << "\nCurrent Orders:" << endl;
-            for (const auto &order : orders)
+            cout << "------------------------------" << endl;
+            for (size_t i = 0; i < orders.size(); ++i)
             {
-                cout << "Item: " << order.item << ", Quantity: " << order.quantity << endl;
+                cout << i + 1 << ". Item: " << orders[i].item << ", Quantity: " << orders[i].quantity << endl;
             }
+            cout << "------------------------------" << endl;
         }
     }
 
